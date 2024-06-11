@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jitserver
+  labels:
+    app: jitserver
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: jitserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jitserver
+    spec:
+      containers:
+      - name: jitserver
+        image: image-registry.openshift-image-registry.svc:5000/scclab-rh10/liberty-acmeair-ee8:24.0.0.4-instanton
+        imagePullPolicy: IfNotPresent
+        # Instruct the OpenJ9 JVM to start in server mode
+        args: ["jitserver"]
+        ports:
+        - containerPort: 38400
+        resources:
+          requests:
+            memory: "2048Mi"
+            cpu: "1000m"
+          limits:
+            memory: "2048Mi"
+            cpu: "8000m"
+        env:
+        - name: OPENJ9_JAVA_OPTIONS
+          value: "-XX:+JITServerLogConnections"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  # A client connects to this endpoint
+  name: jitserver
+spec:
+  selector:
+    app: jitserver
+  ports:
+    - protocol: TCP
+      port: 38400
+      targetPort: 38400
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 86400
+

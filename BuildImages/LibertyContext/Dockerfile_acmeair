@@ -1,0 +1,11 @@
+# Dockerfile used for creating a container capable to run AcmeAir monolithic
+# FROM icr.io/appcafe/open-liberty:full-java21-openj9-ubi-minimal
+FROM icr.io/appcafe/open-liberty:full-java17-openj9-ubi
+
+COPY --chown=1001:0 LibertyFiles/server.xml /config/server.xml
+COPY --chown=1001:0 LibertyFiles/acmeair-java-2.0.0-SNAPSHOT.war /config/apps/
+EXPOSE 9080
+
+ENV VERBOSE=true
+RUN configure.sh
+

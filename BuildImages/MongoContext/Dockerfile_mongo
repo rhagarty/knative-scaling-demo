@@ -1,0 +1,3 @@
+FROM quay.io/mongodb/mongodb-community-server:5.0.17-ubi8
+
+COPY AcmeAirDBBackup /AcmeAirDBBackup
